@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TN English II EOC — Interactive Rubric Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --dark: #12243a;
+    --mid: #1a3a5c;
+    --accent: #c8a96e;
+    --accent2: #e8c87a;
+    --light: #f0ece4;
+    --cream: #faf7f2;
+    --text: #2a1f14;
+    --muted: #8a7a6a;
+    --green: #2d7a4f;
+    --green-light: #e8f5ee;
+    --red: #9b2335;
+    --red-light: #fbeaea;
+    --yellow: #c8a020;
+    --yellow-light: #fdf6e3;
+    --shadow: 0 4px 24px rgba(13,27,42,0.13);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--text);
+    font-family: 'Source Serif 4', Georgia, serif;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--navy);
+    color: var(--light);
+    padding: 2.2rem 2rem 1.6rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      -55deg,
+      transparent, transparent 22px,
+      rgba(200,169,110,0.07) 22px, rgba(200,169,110,0.07) 23px
+    );
+  }
+  header::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+  }
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .header-tag {
+    font-family: 'Source Serif 4', serif;
+    font-weight: 300;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.7rem, 4vw, 2.6rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: #fff;
+  }
+  header h1 span { color: var(--accent); }
+  .header-sub {
+    margin-top: 0.55rem;
+    font-size: 0.92rem;
+    color: rgba(240,236,228,0.7);
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  /* ── TABS ── */
+  .tab-bar {
+    background: var(--dark);
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    border-bottom: 2px solid var(--accent);
+    max-width: 100%;
+  }
+  .tab-bar::-webkit-scrollbar { height: 3px; background: var(--dark); }
+  .tab-bar::-webkit-scrollbar-thumb { background: var(--accent); }
+  .tab-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: rgba(240,236,228,0.55);
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.07em;
+    padding: 0.85rem 1.25rem;
+    cursor: pointer;
+    transition: color 0.2s, background 0.2s;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+  }
+  .tab-btn:hover { color: var(--accent2); background: rgba(200,169,110,0.07); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: rgba(200,169,110,0.1);
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem 1.2rem 4rem;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 0.3rem;
+  }
+  .section-desc {
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 1.6rem;
+  }
+
+  /* ── RUBRIC CARDS ── */
+  .rubric-category {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    border: 1px solid rgba(13,27,42,0.08);
+  }
+  .rubric-cat-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.3rem;
+    background: var(--navy);
+    color: var(--light);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .rubric-cat-header:hover { background: var(--mid); }
+  .cat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .cat-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    flex: 1;
+  }
+  .cat-points {
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+  }
+  .chevron {
+    width: 20px; height: 20px;
+    fill: var(--accent);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+  }
+  .rubric-category.open .chevron { transform: rotate(180deg); }
+
+  .rubric-cat-body {
+    display: none;
+    padding: 1.2rem 1.3rem;
+  }
+  .rubric-category.open .rubric-cat-body { display: block; }
+
+  .cat-standard {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    font-style: italic;
+    border-left: 3px solid var(--accent);
+    padding-left: 0.75rem;
+  }
+
+  /* Score selector */
+  .score-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 0.6rem;
+  }
+  .score-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+  .score-option {
+    border: 2px solid #e0d8cc;
+    border-radius: 8px;
+    padding: 0.65rem 0.5rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.18s;
+    background: var(--cream);
+  }
+  .score-option:hover { border-color: var(--accent); background: #fdf9f2; }
+  .score-option.selected-4 { border-color: var(--green); background: var(--green-light); }
+  .score-option.selected-3 { border-color: #2a7a3e; background: #eef8f1; }
+  .score-option.selected-2 { border-color: var(--yellow); background: var(--yellow-light); }
+  .score-option.selected-1 { border-color: var(--red); background: var(--red-light); }
+  .score-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0.2rem;
+  }
+  .score-num.s4 { color: var(--green); }
+  .score-num.s3 { color: #2a7a3e; }
+  .score-num.s2 { color: var(--yellow); }
+  .score-num.s1 { color: var(--red); }
+  .score-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .score-desc {
+    font-size: 0.73rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+    line-height: 1.35;
+  }
+
+  /* Feedback input */
+  .feedback-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 0.4rem;
+    margin-top: 0.8rem;
+    display: block;
+  }
+  textarea.feedback-box {
+    width: 100%;
+    border: 1.5px solid #e0d8cc;
+    border-radius: 7px;
+    padding: 0.6rem 0.75rem;
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.88rem;
+    color: var(--text);
+    resize: vertical;
+    min-height: 64px;
+    background: var(--cream);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  textarea.feedback-box:focus { border-color: var(--accent); }
+
+  /* ── SCORE SUMMARY ── */
+  .score-bar-wrap {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem 1.3rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(13,27,42,0.08);
+  }
+  .score-bar-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 1rem;
+  }
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.65rem;
+    font-size: 0.83rem;
+  }
+  .score-row-label { width: 160px; flex-shrink: 0; color: var(--text); }
+  .score-bar-bg {
+    flex: 1;
+    height: 12px;
+    background: #ede8e0;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+  .score-row-val {
+    width: 38px;
+    text-align: right;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .total-score-box {
+    background: var(--navy);
+    color: var(--light);
+    border-radius: 10px;
+    padding: 1.3rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  .total-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  .total-label-sub { font-size: 0.78rem; color: rgba(240,236,228,0.6); margin-top: 0.2rem; }
+  .total-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .total-denom {
+    font-size: 1.1rem;
+    color: rgba(240,236,228,0.5);
+  }
+  .performance-badge {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    margin-top: 0.6rem;
+  }
+  .badge-advanced { background: var(--green); color: #fff; }
+  .badge-proficient { background: #3a8a55; color: #fff; }
+  .badge-basic { background: var(--yellow); color: #fff; }
+  .badge-below { background: var(--red); color: #fff; }
+  .badge-none { background: #ccc; color: #555; }
+
+  /* ── TIPS PANEL ── */
+  .tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 1.1rem;
+  }
+  .tip-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 1.2rem 1.1rem;
+    border-top: 4px solid var(--accent);
+    border: 1px solid rgba(13,27,42,0.08);
+    border-top: 4px solid var(--accent);
+  }
+  .tip-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 0.7rem;
+  }
+  .tip-card ul {
+    padding-left: 1.1rem;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--text);
+  }
+  .tip-card ul li { margin-bottom: 0.2rem; }
+
+  /* ── CHECKLIST ── */
+  .checklist-group { margin-bottom: 1.5rem; }
+  .checklist-group-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 0.65rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 2px solid var(--accent);
+  }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.45rem 0.2rem;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .check-item:hover { background: #f5f0e8; }
+  .check-item input[type="checkbox"] {
+    margin-top: 0.22rem;
+    width: 16px; height: 16px;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .check-item label {
+    font-size: 0.87rem;
+    line-height: 1.45;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .check-item.checked label { text-decoration: line-through; color: var(--muted); }
+
+  .checklist-progress {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 1.2rem;
+  }
+  .checklist-progress span { font-weight: 600; color: var(--navy); }
+
+  /* ── VOCAB ── */
+  .vocab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.85rem;
+  }
+  .vocab-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(13,27,42,0.1);
+    box-shadow: 0 2px 8px rgba(13,27,42,0.07);
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+  }
+  .vocab-card:hover { box-shadow: 0 4px 16px rgba(13,27,42,0.12); }
+  .vocab-term {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--navy);
+    margin-bottom: 0.3rem;
+  }
+  .vocab-def {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.45;
+    display: none;
+  }
+  .vocab-card.revealed .vocab-def { display: block; }
+  .vocab-hint {
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .vocab-card.revealed .vocab-hint { display: none; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.3rem;
+    border-radius: 7px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.18s;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--navy);
+    color: var(--accent);
+    border: 2px solid var(--navy);
+  }
+  .btn-primary:hover { background: var(--mid); }
+  .btn-outline {
+    background: transparent;
+    color: var(--navy);
+    border: 2px solid var(--navy);
+  }
+  .btn-outline:hover { background: var(--navy); color: var(--accent); }
+  .btn-accent {
+    background: var(--accent);
+    color: var(--navy);
+    border: 2px solid var(--accent);
+    font-weight: 700;
+  }
+  .btn-accent:hover { background: var(--accent2); }
+  .actions { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 1rem; }
+
+  /* ── PRINT ── */
+  @media print {
+    header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tab-bar, .actions { display: none !important; }
+    .panel { display: block !important; }
+    .rubric-cat-body { display: block !important; }
+    .score-option { border: 1px solid #ccc !important; }
+    .score-option.selected-4,
+    .score-option.selected-3,
+    .score-option.selected-2,
+    .score-option.selected-1 {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .score-options { grid-template-columns: repeat(2, 1fr); }
+    .score-row-label { width: 120px; font-size: 0.75rem; }
+    .total-num { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-tag">Tennessee Academic Standards · English Language Arts</div>
+    <h1>English <span>II</span> EOC — Interactive Rubric Tool</h1>
+    <div class="header-sub">Score your writing, identify areas to grow, and prepare with confidence.</div>
+  </div>
+</header>
+
+<nav class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-panel="rubric">📝 Score My Writing</button>
+  <button class="tab-btn" data-panel="summary">📊 My Score Summary</button>
+  <button class="tab-btn" data-panel="tips">💡 Writing Tips</button>
+  <button class="tab-btn" data-panel="checklist">✅ Revision Checklist</button>
+  <button class="tab-btn" data-panel="vocab">📖 Key Vocabulary</button>
+</nav>
+
+<main>
+
+  <!-- ══════════ RUBRIC PANEL ══════════ -->
+  <div class="panel active" id="panel-rubric">
+    <h2 class="section-title">Score My Writing</h2>
+    <p class="section-desc">Click each category to expand it, then select the score that best matches your essay. Use the feedback box to note what you need to work on.</p>
+
+    <!-- Category 1: Content & Analysis -->
+    <div class="rubric-category" id="cat-1">
+      <div class="rubric-cat-header" onclick="toggleCat('cat-1')">
+        <div class="cat-num">1</div>
+        <div class="cat-title">Content &amp; Analysis</div>
+        <div class="cat-points">up to 4 pts</div>
+        <svg class="chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="rubric-cat-body">
+        <div class="cat-standard">Tennessee Standard: W.2 — Write informative/explanatory or argumentative texts; analyze and evaluate sources and evidence.</div>
+        <div class="score-label">Select your score:</div>
+        <div class="score-options" data-cat="1">
+          <div class="score-option" data-score="4" onclick="selectScore(this,1,4)">
+            <div class="score-num s4">4</div>
+            <div class="score-tag" style="color:var(--green)">Advanced</div>
+            <div class="score-desc">Insightful analysis; strong, relevant textual evidence; fully develops the topic with depth and nuance.</div>
+          </div>
+          <div class="score-option" data-score="3" onclick="selectScore(this,1,3)">
+            <div class="score-num s3">3</div>
+            <div class="score-tag" style="color:#2a7a3e">Proficient</div>
+            <div class="score-desc">Adequate analysis; mostly relevant evidence; topic is developed with some depth.</div>
+          </div>
+          <div class="score-option" data-score="2" onclick="selectScore(this,1,2)">
+            <div class="score-num s2">2</div>
+            <div class="score-tag" style="color:var(--yellow)">Basic</div>
+            <div class="score-desc">Limited analysis; some evidence but may be vague or loosely connected; underdeveloped topic.</div>
+          </div>
+          <div class="score-option" data-score="1" onclick="selectScore(this,1,1)">
+            <div class="score-num s1">1</div>
+            <div class="score-tag" style="color:var(--red)">Below Basic</div>
+            <div class="score-desc">Minimal or no analysis; little to no evidence; topic is barely addressed.</div>
+          </div>
+        </div>
+        <label class="feedback-label">My notes &amp; next steps:</label>
+        <textarea class="feedback-box" placeholder="e.g., I need to add more textual evidence and explain how it supports my claim..." oninput="saveFeedback(1, this.value)"></textarea>
+      </div>
+    </div>
+
+    <!-- Category 2: Structure & Organization -->
+    <div class="rubric-category" id="cat-2">
+      <div class="rubric-cat-header" onclick="toggleCat('cat-2')">
+        <div class="cat-num">2</div>
+        <div class="cat-title">Structure &amp; Organization</div>
+        <div class="cat-points">up to 4 pts</div>
+        <svg class="chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="rubric-cat-body">
+        <div class="cat-standard">Tennessee Standard: W.4 — Produce clear, coherent writing with appropriate organization and structure for task, purpose, and audience.</div>
+        <div class="score-label">Select your score:</div>
+        <div class="score-options" data-cat="2">
+          <div class="score-option" data-score="4" onclick="selectScore(this,2,4)">
+            <div class="score-num s4">4</div>
+            <div class="score-tag" style="color:var(--green)">Advanced</div>
+            <div class="score-desc">Clear intro, body, and conclusion; effective transitions; logical progression of ideas that enhances the reader's understanding.</div>
+          </div>
+          <div class="score-option" data-score="3" onclick="selectScore(this,2,3)">
+            <div class="score-num s3">3</div>
+            <div class="score-tag" style="color:#2a7a3e">Proficient</div>
+            <div class="score-desc">Recognizable structure; adequate transitions; generally logical sequence with minor lapses.</div>
+          </div>
+          <div class="score-option" data-score="2" onclick="selectScore(this,2,2)">
+            <div class="score-num s2">2</div>
+            <div class="score-tag" style="color:var(--yellow)">Basic</div>
+            <div class="score-desc">Some structure but inconsistent; transitions are weak or missing; ideas are not always clearly sequenced.</div>
+          </div>
+          <div class="score-option" data-score="1" onclick="selectScore(this,2,1)">
+            <div class="score-num s1">1</div>
+            <div class="score-tag" style="color:var(--red)">Below Basic</div>
+            <div class="score-desc">Little or no organizational structure; no transitions; ideas are disjointed or random.</div>
+          </div>
+        </div>
+        <label class="feedback-label">My notes &amp; next steps:</label>
+        <textarea class="feedback-box" placeholder="e.g., My conclusion just repeats the intro. I need a stronger closing that reinforces my argument..." oninput="saveFeedback(2, this.value)"></textarea>
+      </div>
+    </div>
+
+    <!-- Category 3: Elaboration & Evidence -->
+    <div class="rubric-category" id="cat-3">
+      <div class="rubric-cat-header" onclick="toggleCat('cat-3')">
+        <div class="cat-num">3</div>
+        <div class="cat-title">Elaboration &amp; Use of Evidence</div>
+        <div class="cat-points">up to 4 pts</div>
+        <svg class="chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="rubric-cat-body">
+        <div class="cat-standard">Tennessee Standard: W.9 — Draw evidence from literary or informational texts to support analysis, reflection, and research.</div>
+        <div class="score-label">Select your score:</div>
+        <div class="score-options" data-cat="3">
+          <div class="score-option" data-score="4" onclick="selectScore(this,3,4)">
+            <div class="score-num s4">4</div>
+            <div class="score-tag" style="color:var(--green)">Advanced</div>
+            <div class="score-desc">Specific, well-chosen quotes/paraphrases integrated smoothly; thorough commentary explains how evidence supports the claim.</div>
+          </div>
+          <div class="score-option" data-score="3" onclick="selectScore(this,3,3)">
+            <div class="score-num s3">3</div>
+            <div class="score-tag" style="color:#2a7a3e">Proficient</div>
+            <div class="score-desc">Adequate evidence with some commentary; most evidence is relevant and clearly connected to the claim.</div>
+          </div>
+          <div class="score-option" data-score="2" onclick="selectScore(this,3,2)">
+            <div class="score-num s2">2</div>
+            <div class="score-tag" style="color:var(--yellow)">Basic</div>
+            <div class="score-desc">Evidence is present but limited or dropped in without explanation; connection to claim is unclear.</div>
+          </div>
+          <div class="score-option" data-score="1" onclick="selectScore(this,3,1)">
+            <div class="score-num s1">1</div>
+            <div class="score-tag" style="color:var(--red)">Below Basic</div>
+            <div class="score-desc">Little or no evidence; no commentary; evidence (if present) is irrelevant or misused.</div>
+          </div>
+        </div>
+        <label class="feedback-label">My notes &amp; next steps:</label>
+        <textarea class="feedback-box" placeholder="e.g., I'm dropping quotes in without explaining them. I need to add commentary after each piece of evidence..." oninput="saveFeedback(3, this.value)"></textarea>
+      </div>
+    </div>
+
+    <!-- Category 4: Style & Language -->
+    <div class="rubric-category" id="cat-4">
+      <div class="rubric-cat-header" onclick="toggleCat('cat-4')">
+        <div class="cat-num">4</div>
+        <div class="cat-title">Style &amp; Language Choices</div>
+        <div class="cat-points">up to 4 pts</div>
+        <svg class="chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="rubric-cat-body">
+        <div class="cat-standard">Tennessee Standard: L.3 — Apply knowledge of language to understand how language functions in different contexts, to make effective choices for meaning or style.</div>
+        <div class="score-label">Select your score:</div>
+        <div class="score-options" data-cat="4">
+          <div class="score-option" data-score="4" onclick="selectScore(this,4,4)">
+            <div class="score-num s4">4</div>
+            <div class="score-tag" style="color:var(--green)">Advanced</div>
+            <div class="score-desc">Precise, academic vocabulary; varied sentence structure; formal tone maintained consistently; stylistic choices enhance meaning.</div>
+          </div>
+          <div class="score-option" data-score="3" onclick="selectScore(this,4,3)">
+            <div class="score-num s3">3</div>
+            <div class="score-tag" style="color:#2a7a3e">Proficient</div>
+            <div class="score-desc">Adequate word choice; some sentence variety; mostly formal tone with minor lapses.</div>
+          </div>
+          <div class="score-option" data-score="2" onclick="selectScore(this,4,2)">
+            <div class="score-num s2">2</div>
+            <div class="score-tag" style="color:var(--yellow)">Basic</div>
+            <div class="score-desc">Limited vocabulary; repetitive sentence structure; inconsistent tone; some informal language present.</div>
+          </div>
+          <div class="score-option" data-score="1" onclick="selectScore(this,4,1)">
+            <div class="score-num s1">1</div>
+            <div class="score-tag" style="color:var(--red)">Below Basic</div>
+            <div class="score-desc">Vague or inaccurate word choice; monotonous sentences; inappropriate or informal tone throughout.</div>
+          </div>
+        </div>
+        <label class="feedback-label">My notes &amp; next steps:</label>
+        <textarea class="feedback-box" placeholder="e.g., I keep using 'good' and 'bad.' I need to swap in more specific academic vocabulary..." oninput="saveFeedback(4, this.value)"></textarea>
+      </div>
+    </div>
+
+    <!-- Category 5: Conventions -->
+    <div class="rubric-category" id="cat-5">
+      <div class="rubric-cat-header" onclick="toggleCat('cat-5')">
+        <div class="cat-num">5</div>
+        <div class="cat-title">Conventions (Grammar, Spelling, Mechanics)</div>
+        <div class="cat-points">up to 4 pts</div>
+        <svg class="chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="rubric-cat-body">
+        <div class="cat-standard">Tennessee Standard: L.1, L.2 — Demonstrate command of the conventions of standard English grammar, capitalization, punctuation, and spelling.</div>
+        <div class="score-label">Select your score:</div>
+        <div class="score-options" data-cat="5">
+          <div class="score-option" data-score="4" onclick="selectScore(this,5,4)">
+            <div class="score-num s4">4</div>
+            <div class="score-tag" style="color:var(--green)">Advanced</div>
+            <div class="score-desc">Few or no errors; any errors are minor and do not interfere with meaning; demonstrates command of conventions.</div>
+          </div>
+          <div class="score-option" data-score="3" onclick="selectScore(this,5,3)">
+            <div class="score-num s3">3</div>
+            <div class="score-tag" style="color:#2a7a3e">Proficient</div>
+            <div class="score-desc">Some errors but they rarely interfere with meaning; demonstrates adequate control of conventions.</div>
+          </div>
+          <div class="score-option" data-score="2" onclick="selectScore(this,5,2)">
+            <div class="score-num s2">2</div>
+            <div class="score-tag" style="color:var(--yellow)">Basic</div>
+            <div class="score-desc">Several errors that sometimes interfere with meaning; limited control of conventions.</div>
+          </div>
+          <div class="score-option" data-score="1" onclick="selectScore(this,5,1)">
+            <div class="score-num s1">1</div>
+            <div class="score-tag" style="color:var(--red)">Below Basic</div>
+            <div class="score-desc">Pervasive errors that significantly interfere with meaning; little or no control of conventions.</div>
+          </div>
+        </div>
+        <label class="feedback-label">My notes &amp; next steps:</label>
+        <textarea class="feedback-box" placeholder="e.g., I have a lot of comma splices. I need to review how to join independent clauses correctly..." oninput="saveFeedback(5, this.value)"></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-accent" onclick="switchPanel('summary')">📊 View My Score Summary →</button>
+      <button class="btn btn-outline" onclick="resetAll()">↺ Reset Scores</button>
+    </div>
+  </div>
+
+  <!-- ══════════ SUMMARY PANEL ══════════ -->
+  <div class="panel" id="panel-summary">
+    <h2 class="section-title">My Score Summary</h2>
+    <p class="section-desc">A snapshot of your self-assessment across all five EOC writing domains.</p>
+
+    <div class="total-score-box" id="totalBox">
+      <div>
+        <div class="total-label">Total Score</div>
+        <div class="total-label-sub">Out of 20 possible points</div>
+        <div id="perfBadge" class="performance-badge badge-none">Not yet scored</div>
+      </div>
+      <div>
+        <span class="total-num" id="totalNum">—</span>
+        <span class="total-denom"> / 20</span>
+      </div>
+    </div>
+
+    <div class="score-bar-wrap">
+      <div class="score-bar-title">Score by Domain</div>
+      <div id="barRows"></div>
+    </div>
+
+    <div id="feedbackSummary" style="background:#fff;border-radius:10px;box-shadow:var(--shadow);padding:1.3rem;border:1px solid rgba(13,27,42,0.08);margin-bottom:1.2rem;display:none;">
+      <div class="score-bar-title" style="margin-bottom:0.8rem;">Your Notes &amp; Next Steps</div>
+      <div id="feedbackList"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="switchPanel('rubric')">← Back to Rubric</button>
+      <button class="btn btn-outline" onclick="switchPanel('tips')">💡 View Writing Tips</button>
+      <button class="btn btn-accent" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    </div>
+  </div>
+
+  <!-- ══════════ TIPS PANEL ══════════ -->
+  <div class="panel" id="panel-tips">
+    <h2 class="section-title">Writing Tips for the EOC</h2>
+    <p class="section-desc">Strategies straight from Tennessee's English II standards to help you score your best.</p>
+
+    <div class="tips-grid">
+      <div class="tip-card">
+        <div class="tip-card-title">📌 Strong Thesis Statements</div>
+        <ul>
+          <li>Make a specific, arguable claim — not just a topic.</li>
+          <li>Preview the main points of your essay.</li>
+          <li>Avoid starting with "I think" or "In this essay."</li>
+          <li>Example: "Steinbeck uses imagery and dialogue to reveal the destructive nature of the American Dream."</li>
+        </ul>
+      </div>
+      <div class="tip-card">
+        <div class="tip-card-title">📖 Using Textual Evidence</div>
+        <ul>
+          <li>Always introduce quotes with a signal phrase.</li>
+          <li>Use the PEEL method: Point → Evidence → Explain → Link.</li>
+          <li>Don't drop quotes without commentary.</li>
+          <li>Cite your evidence (author's last name or line number).</li>
+        </ul>
+      </div>
+      <div class="tip-card">
+        <div class="tip-card-title">🔗 Transitions &amp; Cohesion</div>
+        <ul>
+          <li>Use transitions between paragraphs, not just within them.</li>
+          <li>Try: "Furthermore," "In contrast," "This suggests that…"</li>
+          <li>Echo a key word from your thesis in each body paragraph.</li>
+          <li>End each paragraph by linking back to your central claim.</li>
+        </ul>
+      </div>
+      <div class="tip-card">
+        <div class="tip-card-title">🗣️ Formal Academic Style</div>
+        <ul>
+          <li>Avoid contractions (don't → do not).</li>
+          <li>Never write "I feel" — use "The text suggests…"</li>
+          <li>Replace vague words: "good" → "effective," "meaningful."</li>
+          <li>Vary sentence length for rhythm and emphasis.</li>
+        </ul>
+      </div>
+      <div class="tip-card">
+        <div class="tip-card-title">✍️ Introduction &amp; Conclusion</div>
+        <ul>
+          <li>Hook options: quote, anecdote, startling statistic, question.</li>
+          <li>Provide brief context before your thesis.</li>
+          <li>Conclusion should synthesize, not just summarize.</li>
+          <li>End with a "so what?" — the broader significance.</li>
+        </ul>
+      </div>
+      <div class="tip-card">
+        <div class="tip-card-title">✅ Conventions Quick Wins</div>
+        <ul>
+          <li>Comma splice fix: use a semicolon, period, or FANBOYS.</li>
+          <li>Subject-verb agreement: re-read each sentence independently.</li>
+          <li>Use spell-check AND re-read aloud for missed errors.</li>
+          <li>Titles of books are italicized; short works use "quotes."</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ CHECKLIST PANEL ══════════ -->
+  <div class="panel" id="panel-checklist">
+    <h2 class="section-title">Revision Checklist</h2>
+    <p class="section-desc" id="checklistProgress">Check off each item as you review your essay before submitting.</p>
+
+    <div class="checklist-group">
+      <div class="checklist-group-title">Content &amp; Analysis</div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>My thesis makes a clear, specific, arguable claim.</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>Each body paragraph has one focused main idea tied to my thesis.</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>I analyze the text — not just summarize what happens.</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>I address the full prompt, including all parts of the question.</label></div>
+    </div>
+
+    <div class="checklist-group">
+      <div class="checklist-group-title">Structure &amp; Organization</div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>My introduction ends with a clear thesis statement.</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>My paragraphs are in a logical, deliberate order.</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>I use transitions between paragraphs (not just within them).</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>My conclusion does more than restate the intro — it synthesizes.</label></div>
+    </div>
+
+    <div class="checklist-group">
+      <div class="checklist-group-title">Evidence &amp; Elaboration</div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>Every piece of evidence has a signal phrase introducing it.</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>After each quote/paraphrase, I explain HOW it supports my claim.</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>I use at least two pieces of evidence per body paragraph.</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>All evidence is relevant and directly supports my argument.</label></div>
+    </div>
+
+    <div class="checklist-group">
+      <div class="checklist-group-title">Style &amp; Language</div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>I replaced vague words (good, bad, nice) with precise vocabulary.</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>My sentence lengths vary — not all short, not all long.</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>I removed contractions and first-person ("I feel," "I think").</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>My tone stays formal and academic throughout.</label></div>
+    </div>
+
+    <div class="checklist-group">
+      <div class="checklist-group-title">Conventions</div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>I read my essay aloud to catch awkward sentences and errors.</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>I checked for comma splices and run-on sentences.</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>Subject and verb agree in every sentence.</label></div>
+      <div class="check-item" onclick="toggleCheck(this)"><input type="checkbox"><label>Titles are formatted correctly (italics or quotation marks).</label></div>
+    </div>
+  </div>
+
+  <!-- ══════════ VOCAB PANEL ══════════ -->
+  <div class="panel" id="panel-vocab">
+    <h2 class="section-title">Key Vocabulary</h2>
+    <p class="section-desc">Tap any card to reveal the definition. Know these terms cold before your EOC.</p>
+
+    <div class="vocab-grid" id="vocabGrid">
+      <!-- cards generated by JS -->
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* ── STATE ── */
+const scores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+const feedback = { 1: '', 2: '', 3: '', 4: '', 5: '' };
+const catNames = {
+  1: 'Content & Analysis',
+  2: 'Structure & Organization',
+  3: 'Elaboration & Evidence',
+  4: 'Style & Language',
+  5: 'Conventions'
+};
+
+/* ── TABS ── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchPanel(btn.dataset.panel));
+});
+
+function switchPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelector(`.tab-btn[data-panel="${id}"]`).classList.add('active');
+  if (id === 'summary') buildSummary();
+  if (id === 'checklist') updateChecklistProgress();
+}
+
+/* ── ACCORDION ── */
+function toggleCat(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+/* ── SCORING ── */
+function selectScore(el, cat, score) {
+  const opts = el.closest('.score-options').querySelectorAll('.score-option');
+  opts.forEach(o => { o.className = 'score-option'; });
+  el.classList.add('selected-' + score);
+  scores[cat] = score;
+}
+
+function saveFeedback(cat, val) {
+  feedback[cat] = val;
+}
+
+function resetAll() {
+  if (!confirm('Reset all scores and notes?')) return;
+  for (let i = 1; i <= 5; i++) {
+    scores[i] = 0;
+    feedback[i] = '';
+    const opts = document.querySelectorAll(`[data-cat="${i}"] .score-option`);
+    opts.forEach(o => o.className = 'score-option');
+    const ta = document.querySelectorAll('.feedback-box')[i - 1];
+    if (ta) ta.value = '';
+  }
+}
+
+/* ── SUMMARY ── */
+function buildSummary() {
+  const total = Object.values(scores).reduce((a, b) => a + b, 0);
+  document.getElementById('totalNum').textContent = total || '—';
+
+  // Badge
+  const badge = document.getElementById('perfBadge');
+  const scored = Object.values(scores).some(s => s > 0);
+  if (!scored) {
+    badge.textContent = 'Not yet scored';
+    badge.className = 'performance-badge badge-none';
+  } else if (total >= 17) {
+    badge.textContent = 'Advanced';
+    badge.className = 'performance-badge badge-advanced';
+  } else if (total >= 13) {
+    badge.textContent = 'Proficient';
+    badge.className = 'performance-badge badge-proficient';
+  } else if (total >= 9) {
+    badge.textContent = 'Basic';
+    badge.className = 'performance-badge badge-basic';
+  } else {
+    badge.textContent = 'Below Basic';
+    badge.className = 'performance-badge badge-below';
+  }
+
+  // Bars
+  const barRows = document.getElementById('barRows');
+  barRows.innerHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    const pct = scores[i] ? (scores[i] / 4) * 100 : 0;
+    barRows.innerHTML += `
+      <div class="score-row">
+        <div class="score-row-label">${catNames[i]}</div>
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct}%"></div></div>
+        <div class="score-row-val">${scores[i] || '—'}</div>
+      </div>`;
+  }
+
+  // Feedback notes
+  const fList = document.getElementById('feedbackList');
+  const fSec = document.getElementById('feedbackSummary');
+  const hasFeedback = Object.values(feedback).some(f => f.trim() !== '');
+  if (hasFeedback) {
+    fSec.style.display = '';
+    fList.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+      if (feedback[i].trim()) {
+        fList.innerHTML += `
+          <div style="margin-bottom:0.85rem;">
+            <div style="font-weight:600;font-size:0.85rem;color:var(--navy);margin-bottom:0.2rem;">${catNames[i]}</div>
+            <div style="font-size:0.85rem;color:var(--muted);line-height:1.5;padding-left:0.8rem;border-left:3px solid var(--accent);">${feedback[i].replace(/\n/g,'<br>')}</div>
+          </div>`;
+      }
+    }
+  } else {
+    fSec.style.display = 'none';
+  }
+}
+
+/* ── CHECKLIST ── */
+function toggleCheck(el) {
+  const cb = el.querySelector('input');
+  cb.checked = !cb.checked;
+  el.classList.toggle('checked', cb.checked);
+  updateChecklistProgress();
+}
+
+function updateChecklistProgress() {
+  const total = document.querySelectorAll('.check-item').length;
+  const done = document.querySelectorAll('.check-item.checked').length;
+  document.getElementById('checklistProgress').innerHTML =
+    `<span>${done}</span> of <span>${total}</span> items checked — keep going!`;
+}
+
+/* ── VOCAB ── */
+const vocabData = [
+  { term: 'Thesis Statement', def: 'A specific, arguable claim that states the main argument of an essay; usually appears at the end of the introduction.' },
+  { term: 'Textual Evidence', def: 'Quotes, paraphrases, or summaries drawn directly from a text to support a claim or argument.' },
+  { term: 'Commentary', def: 'The writer\'s explanation of how evidence supports the main claim; the "so what?" after each quote.' },
+  { term: 'Claim', def: 'An assertion or argument the writer is trying to prove throughout the essay.' },
+  { term: 'Counterclaim', def: 'An opposing argument that the writer must acknowledge and refute in an argumentative essay.' },
+  { term: 'Tone', def: 'The author\'s attitude toward the subject, conveyed through word choice and style (e.g., formal, ironic, somber).' },
+  { term: 'Diction', def: 'Word choice; the specific words an author selects to convey meaning, tone, and style.' },
+  { term: 'Syntax', def: 'The arrangement of words and phrases in a sentence; sentence structure.' },
+  { term: 'Figurative Language', def: 'Non-literal language used for effect: metaphor, simile, personification, hyperbole, alliteration, etc.' },
+  { term: 'Inference', def: 'A conclusion drawn from evidence and reasoning rather than from explicit statements in the text.' },
+  { term: 'Theme', def: 'A central message or insight about life that a literary work conveys, broader than just the topic.' },
+  { term: 'Rhetorical Appeals', def: 'Ethos (credibility), Pathos (emotion), and Logos (logic) — strategies used to persuade an audience.' },
+  { term: 'Central Idea', def: 'The most important point the author makes in an informational text; similar to the main idea or thesis.' },
+  { term: 'Point of View', def: 'The perspective from which a story is told (1st, 2nd, 3rd limited, 3rd omniscient) or an author\'s perspective on a topic.' },
+  { term: 'Context Clues', def: 'Information within a sentence or passage that helps determine the meaning of an unfamiliar word.' },
+  { term: 'Cohesion', def: 'The quality of ideas flowing smoothly and logically together, achieved through transitions and consistent focus.' },
+  { term: 'Argument', def: 'A reasoned, evidence-based defense of a claim; in writing, it includes a claim, evidence, and reasoning.' },
+  { term: 'Synthesis', def: 'Combining ideas from multiple sources or perspectives into a unified, coherent analysis.' },
+  { term: 'Connotation', def: 'The emotional or cultural associations of a word, beyond its dictionary definition.' },
+  { term: 'Denotation', def: 'The literal, dictionary definition of a word, without emotional associations.' },
+  { term: 'Allusion', def: 'An indirect reference to a person, event, text, or place that the author expects the reader to recognize.' },
+  { term: 'Characterization', def: 'The methods an author uses to reveal a character\'s personality: direct (telling) or indirect (showing through actions, speech, etc.).' },
+];
+
+const grid = document.getElementById('vocabGrid');
+vocabData.forEach(v => {
+  const card = document.createElement('div');
+  card.className = 'vocab-card';
+  card.innerHTML = `<div class="vocab-term">${v.term}</div>
+    <div class="vocab-hint">Tap to reveal ↓</div>
+    <div class="vocab-def">${v.def}</div>`;
+  card.addEventListener('click', () => card.classList.toggle('revealed'));
+  grid.appendChild(card);
+});
+
+// SVG paths (chevron)
+document.querySelectorAll('.chevron').forEach(svg => {
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2.5');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.querySelector('path').setAttribute('fill', 'none');
+});
+</script>
+</body>
+</html>
